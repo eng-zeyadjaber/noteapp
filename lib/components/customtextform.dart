@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 
 class CustTextFormSign extends StatelessWidget {
   final String hint;
-  const CustTextFormSign({super.key, required this.hint});
+  final TextEditingController mycontroller;
+  const CustTextFormSign({
+    super.key,
+    required this.hint,
+    required this.mycontroller,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 10, top: 10),
       child: TextFormField(
+        controller: mycontroller,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
           hintText: hint,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:noteapp/app/auth/login.dart';
+import 'package:noteapp/app/auth/signup.dart';
+import 'package:noteapp/app/home.dart';
 
 void main() async {
   runApp(MyApp());
@@ -13,8 +15,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Note App",
-      initialRoute: "/",
-      routes: {"/": (context) => Login()},
+      initialRoute: "login",
+      routes: {
+        "login": (context) => Login(),
+        "signup": (context) => SignUp(),
+        "home": (context) => Home(),
+      },
     );
   }
 }
