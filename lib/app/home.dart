@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:noteapp/components/cardnotes.dart';
+import 'package:noteapp/components/crud.dart';
+import 'package:noteapp/constant/linkapi.dart';
+import 'package:noteapp/main.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -8,10 +12,32 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Crud crud = Crud();
+
+  getNotes() async {
+    var response = await crud.postRequest(linkViewNotes, {
+      "id": sharedPref.getString("id"),
+    });
+    return response;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Home")),
+      appBar: AppBar(
+        title: Text("Home"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              sharedPref.clear();
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil("login", (ruote) => false);
+            },
+            icon: Icon(Icons.exit_to_app),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         child: Icon(Icons.add),
@@ -20,33 +46,15 @@ class _HomeState extends State<Home> {
         padding: EdgeInsets.all(10),
         child: ListView(
           children: [
-            InkWell(
-              onTap: () {},
-              child: Card(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 0,
-                      child: ClipOval(
-                        child: Image.network(
-                          "https://i.pinimg.com/736x/31/5a/63/315a6337729ca3ab4e890a46f7daa677.jpg",
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: ListTile(
-                        title: Text("clup"),
-                        subtitle: Text("Legend"),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            FutureBuilder(
+              future: getNotes(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.hasData) {}
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                return Center(child: CircularProgressIndicator());
+              },
             ),
           ],
         ),

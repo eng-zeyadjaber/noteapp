@@ -18,6 +18,7 @@ class Crud {
   }
 
   postRequest(String url, Map date) async {
+    await Future.delayed(Duration(seconds: 2));
     try {
       var response = await http.post(Uri.parse(url), body: date);
       if (response.statusCode == 200) {
