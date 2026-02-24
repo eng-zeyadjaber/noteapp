@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:noteapp/app/auth/login.dart';
 import 'package:noteapp/app/auth/signup.dart';
 import 'package:noteapp/app/home.dart';
+import 'package:noteapp/app/notes/add.dart';
+import 'package:noteapp/app/notes/edit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences sharedPref;
@@ -24,6 +26,8 @@ class MyApp extends StatelessWidget {
         "login": (context) => Login(),
         "signup": (context) => SignUp(),
         "home": (context) => Home(),
+        "addnotes": (context) => AddNotes(),
+        "editnotes": (context) => EditNotes(),
       },
     );
   }

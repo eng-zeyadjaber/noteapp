@@ -39,7 +39,11 @@ class _HomeState extends State<Home> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil("addnotes", (route) => false);
+        },
         child: Icon(Icons.add),
       ),
       body: Container(
@@ -49,7 +53,30 @@ class _HomeState extends State<Home> {
             FutureBuilder(
               future: getNotes(),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.hasData) {}
+                if (snapshot.hasData) {
+                  if (snapshot.data['status'] == 'fail')
+                    return Center(
+                      child: Text(
+                        "There are no comments",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  return ListView.builder(
+                    itemCount: snapshot.data['data'].length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, i) {
+                      return CardNotes(
+                        ontap: () {},
+                        title: "${snapshot.data['data'][i]['notes_title']}",
+                        content: "${snapshot.data['data'][i]['notes_content']}",
+                      );
+                    },
+                  );
+                }
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 }
