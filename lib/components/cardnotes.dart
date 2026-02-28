@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:noteapp/model/noteModel.dart';
 
 class CardNotes extends StatelessWidget {
   final void Function()? ontap;
-  final String title;
-  final String content;
+  final NoteModel notemodel;
+  final void Function()? onDelete;
   const CardNotes({
     super.key,
     required this.ontap,
-    required this.title,
-    required this.content,
+    this.onDelete,
+    required this.notemodel,
   });
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: ontap,
+      onLongPress: ontap,
       child: Card(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -32,8 +33,12 @@ class CardNotes extends StatelessWidget {
             Expanded(
               flex: 2,
               child: ListTile(
-                title: Text("$title"),
-                subtitle: Text("$content"),
+                title: Text("${notemodel.notesTitle}"),
+                subtitle: Text("${notemodel.notesContent}"),
+                trailing: IconButton(
+                  onPressed: onDelete,
+                  icon: Icon(Icons.folder_delete_rounded),
+                ),
               ),
             ),
           ],

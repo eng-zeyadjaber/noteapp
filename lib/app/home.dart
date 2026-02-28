@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:noteapp/app/notes/edit.dart';
 import 'package:noteapp/components/cardnotes.dart';
 import 'package:noteapp/components/crud.dart';
 import 'package:noteapp/constant/linkapi.dart';
 import 'package:noteapp/main.dart';
+import 'package:noteapp/model/noteModel.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -70,9 +72,25 @@ class _HomeState extends State<Home> {
                     physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, i) {
                       return CardNotes(
-                        ontap: () {},
-                        title: "${snapshot.data['data'][i]['notes_title']}",
-                        content: "${snapshot.data['data'][i]['notes_content']}",
+                        onDelete: () async {
+                          var response = await crud
+                              .postRequest(linkDeleteNotes, {
+                                "id": snapshot.data['data'][i]['notes_id']
+                                    .toString(),
+                              });
+                          if (response['status'] == "success") {
+                            Navigator.of(context).pushReplacementNamed("home");
+                          }
+                        },
+                        ontap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EditNotes(notes: snapshot.data['data'][i]),
+                            ),
+                          );
+                        },
+                        notemodel: NoteModel.fromJson(snapshot.data['data'][i]),
                       );
                     },
                   );

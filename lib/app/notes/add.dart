@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:noteapp/components/crud.dart';
 import 'package:noteapp/components/customtextform.dart';
 import 'package:noteapp/components/valid.dart';
@@ -16,6 +18,7 @@ class AddNotes extends StatefulWidget {
 
 class _AddNotesState extends State<AddNotes> {
   Crud crud = Crud();
+  File? myfile;
   GlobalKey<FormState> formstate = GlobalKey<FormState>();
   TextEditingController title = TextEditingController();
   TextEditingController content = TextEditingController();
@@ -66,25 +69,71 @@ class _AddNotesState extends State<AddNotes> {
                       },
                     ),
                     SizedBox(height: 10),
-                    Container(
-                      height: 30,
-                      width: 5,
-                      color: Colors.blue,
-                      child: InkWell(
-                        onTap: () async {
-                          await AddNotes();
-                        },
-                        child: Center(
-                          child: Text(
-                            "Add",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontStyle: FontStyle.italic,
-                            ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              await AddNotes();
+                            },
+                            child: Text("Add"),
                           ),
                         ),
-                      ),
+                        SizedBox(width: 10),
+                        IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => FractionallySizedBox(
+                                heightFactor: 0.5,
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(20),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.start, // أعلى
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      IconButton(
+                                        padding: EdgeInsets.all(10),
+                                        onPressed: () async {
+                                          XFile? xfile = await ImagePicker()
+                                              .pickImage(
+                                                source: ImageSource.gallery,
+                                              );
+                                          myfile = File(xfile!.path);
+                                        },
+                                        icon: Icon(
+                                          Icons.photo_library,
+                                          size: 30,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      IconButton(
+                                        padding: EdgeInsets.all(10),
+                                        onPressed: () async {
+                                          XFile? xfile = await ImagePicker()
+                                              .pickImage(
+                                                source: ImageSource.camera,
+                                              );
+                                          myfile = File(xfile!.path);
+                                        },
+                                        icon: Icon(
+                                          Icons.photo_camera_rounded,
+                                          size: 30,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.image_rounded),
+                        ),
+                      ],
                     ),
                   ],
                 ),
