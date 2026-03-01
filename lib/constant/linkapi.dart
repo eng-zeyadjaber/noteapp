@@ -1,4 +1,5 @@
 const String linkServarName = "http://192.168.65.112/coursephp";
+const String linkImageRoot = "http://192.168.65.112/coursephp/upload";
 //Auth
 const String linkSignUp = "$linkServarName/auth/SignUp.php";
 const String linkLogin = "$linkServarName/auth/login.php";

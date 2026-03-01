@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:noteapp/components/crud.dart';
@@ -24,14 +25,20 @@ class _AddNotesState extends State<AddNotes> {
   TextEditingController content = TextEditingController();
   bool isLoding = false;
   AddNotes() async {
+    if (myfile == null)
+      return AwesomeDialog(
+        context: context,
+        title: "Important",
+        body: Text("Add Image Note", style: TextStyle(fontSize: 20)),
+      )..show();
     if (formstate.currentState!.validate()) {
       isLoding = true;
       setState(() {});
-      var response = await crud.postRequest(linkAddNotes, {
+      var response = await crud.postRequestWithFile(linkAddNotes, {
         "title": title.text,
         "content": content.text,
         "id": sharedPref.getString("id"),
-      });
+      }, myfile!);
       isLoding = false;
       setState(() {});
       if (response['status'] == "success") {
@@ -86,7 +93,7 @@ class _AddNotesState extends State<AddNotes> {
                               context: context,
                               isScrollControlled: true,
                               builder: (context) => FractionallySizedBox(
-                                heightFactor: 0.5,
+                                heightFactor: 0.2,
                                 child: Container(
                                   width: double.infinity,
                                   padding: EdgeInsets.all(20),
@@ -103,7 +110,9 @@ class _AddNotesState extends State<AddNotes> {
                                               .pickImage(
                                                 source: ImageSource.gallery,
                                               );
+                                          Navigator.of(context).pop();
                                           myfile = File(xfile!.path);
+                                          setState(() {});
                                         },
                                         icon: Icon(
                                           Icons.photo_library,
@@ -117,8 +126,13 @@ class _AddNotesState extends State<AddNotes> {
                                           XFile? xfile = await ImagePicker()
                                               .pickImage(
                                                 source: ImageSource.camera,
+                                                imageQuality: 80,
+                                                preferredCameraDevice:
+                                                    CameraDevice.rear,
                                               );
+                                          Navigator.of(context).pop();
                                           myfile = File(xfile!.path);
+                                          setState(() {});
                                         },
                                         icon: Icon(
                                           Icons.photo_camera_rounded,
@@ -131,7 +145,14 @@ class _AddNotesState extends State<AddNotes> {
                               ),
                             );
                           },
-                          icon: Icon(Icons.image_rounded),
+                          icon: Icon(
+                            myfile == null
+                                ? Icons.image_rounded
+                                : Icons.check_circle,
+                            color: myfile == null
+                                ? Colors.blueGrey[700]
+                                : Colors.green,
+                          ),
                         ),
                       ],
                     ),

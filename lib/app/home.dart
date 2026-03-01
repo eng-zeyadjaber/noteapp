@@ -59,7 +59,7 @@ class _HomeState extends State<Home> {
                   if (snapshot.data['status'] == 'fail')
                     return Center(
                       child: Text(
-                        "There are no comments",
+                        "There are no Notes",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -76,6 +76,9 @@ class _HomeState extends State<Home> {
                           var response = await crud
                               .postRequest(linkDeleteNotes, {
                                 "id": snapshot.data['data'][i]['notes_id']
+                                    .toString(),
+                                "imagename": snapshot
+                                    .data['data'][i]['notes_image']
                                     .toString(),
                               });
                           if (response['status'] == "success") {

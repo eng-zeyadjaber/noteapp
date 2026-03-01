@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:noteapp/components/crud.dart';
 import 'package:noteapp/components/customtextform.dart';
 import 'package:noteapp/components/valid.dart';
@@ -17,6 +19,7 @@ class EditNotes extends StatefulWidget {
 
 class _AddNotesState extends State<EditNotes> {
   Crud crud = Crud();
+  File? myfile;
   GlobalKey<FormState> formstate = GlobalKey<FormState>();
   TextEditingController title = TextEditingController();
   TextEditingController content = TextEditingController();
@@ -25,11 +28,22 @@ class _AddNotesState extends State<EditNotes> {
     if (formstate.currentState!.validate()) {
       isLoding = true;
       setState(() {});
-      var response = await crud.postRequest(linkEditNotes, {
-        "title": title.text,
-        "content": content.text,
-        "id": widget.notes['notes_id'].toString(),
-      });
+      var response;
+      if (myfile == null) {
+        response = await crud.postRequest(linkEditNotes, {
+          "title": title.text,
+          "content": content.text,
+          "id": widget.notes['notes_id'].toString(),
+          "imagename": widget.notes['notes_image'].toString(),
+        });
+      } else {
+        response = await crud.postRequestWithFile(linkEditNotes, {
+          "title": title.text,
+          "content": content.text,
+          "id": widget.notes['notes_id'].toString(),
+          "imagename": widget.notes['notes_image'].toString(),
+        }, myfile!);
+      }
       isLoding = false;
       setState(() {});
       if (response['status'] == "success") {
@@ -74,25 +88,87 @@ class _AddNotesState extends State<EditNotes> {
                       },
                     ),
                     SizedBox(height: 10),
-                    Container(
-                      height: 30,
-                      width: 5,
-                      color: Colors.blue,
-                      child: InkWell(
-                        onTap: () async {
-                          await EditNotes();
-                        },
-                        child: Center(
-                          child: Text(
-                            "Save",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontStyle: FontStyle.italic,
+                    SizedBox(height: 10),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
                             ),
+                            onPressed: () async {
+                              await EditNotes();
+                            },
+                            child: Text("Save", style: TextStyle(fontSize: 16)),
                           ),
                         ),
-                      ),
+
+                        SizedBox(width: 10),
+
+                        IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => FractionallySizedBox(
+                                heightFactor: 0.2,
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(20),
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () async {
+                                          XFile? xfile = await ImagePicker()
+                                              .pickImage(
+                                                source: ImageSource.gallery,
+                                              );
+                                          Navigator.of(context).pop();
+
+                                          if (xfile != null) {
+                                            myfile = File(xfile.path);
+                                            setState(() {});
+                                          }
+                                        },
+                                        icon: Icon(Icons.photo_library),
+                                      ),
+                                      SizedBox(width: 10),
+                                      IconButton(
+                                        onPressed: () async {
+                                          XFile? xfile = await ImagePicker()
+                                              .pickImage(
+                                                source: ImageSource.camera,
+                                                imageQuality: 80,
+                                              );
+                                          Navigator.of(context).pop();
+
+                                          if (xfile != null) {
+                                            myfile = File(xfile.path);
+                                            setState(() {});
+                                          }
+                                        },
+                                        icon: Icon(Icons.photo_camera_rounded),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            myfile == null
+                                ? Icons.image_rounded
+                                : Icons.check_circle,
+                            color: myfile == null
+                                ? Colors.blueGrey[700]
+                                : Colors.green,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

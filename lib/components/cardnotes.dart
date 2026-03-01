@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:noteapp/constant/linkapi.dart';
 import 'package:noteapp/model/noteModel.dart';
 
 class CardNotes extends StatelessWidget {
@@ -23,7 +24,7 @@ class CardNotes extends StatelessWidget {
               flex: 0,
               child: ClipOval(
                 child: Image.network(
-                  "https://i.pinimg.com/736x/31/5a/63/315a6337729ca3ab4e890a46f7daa677.jpg",
+                  "$linkImageRoot/${notemodel.notesImage}",
                   width: 100,
                   height: 100,
                   fit: BoxFit.cover,
