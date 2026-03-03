@@ -61,6 +61,37 @@ class _AddNotesState extends State<AddNotes> {
                 key: formstate,
                 child: ListView(
                   children: [
+                    /// 🔹 صورة الملاحظة (دائرية في المنتصف)
+                    Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 20),
+                        width: 150,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: myfile != null
+                              ? Image.file(myfile!, fit: BoxFit.cover)
+                              : Container(
+                                  color: Colors.grey[200],
+                                  child: Icon(
+                                    Icons.image,
+                                    size: 60,
+                                    color: Colors.grey[400],
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
                     CustTextFormSign(
                       hint: "title",
                       mycontroller: title,
@@ -87,64 +118,7 @@ class _AddNotesState extends State<AddNotes> {
                           ),
                         ),
                         SizedBox(width: 10),
-                        IconButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (context) => FractionallySizedBox(
-                                heightFactor: 0.2,
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.all(20),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.start, // أعلى
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      IconButton(
-                                        padding: EdgeInsets.all(10),
-                                        onPressed: () async {
-                                          XFile? xfile = await ImagePicker()
-                                              .pickImage(
-                                                source: ImageSource.gallery,
-                                              );
-                                          Navigator.of(context).pop();
-                                          myfile = File(xfile!.path);
-                                          setState(() {});
-                                        },
-                                        icon: Icon(
-                                          Icons.photo_library,
-                                          size: 30,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      IconButton(
-                                        padding: EdgeInsets.all(10),
-                                        onPressed: () async {
-                                          XFile? xfile = await ImagePicker()
-                                              .pickImage(
-                                                source: ImageSource.camera,
-                                                imageQuality: 80,
-                                                preferredCameraDevice:
-                                                    CameraDevice.rear,
-                                              );
-                                          Navigator.of(context).pop();
-                                          myfile = File(xfile!.path);
-                                          setState(() {});
-                                        },
-                                        icon: Icon(
-                                          Icons.photo_camera_rounded,
-                                          size: 30,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                        PopupMenuButton<String>(
                           icon: Icon(
                             myfile == null
                                 ? Icons.image_rounded
@@ -153,6 +127,52 @@ class _AddNotesState extends State<AddNotes> {
                                 ? Colors.blueGrey[700]
                                 : Colors.green,
                           ),
+                          onSelected: (value) async {
+                            XFile? xfile;
+
+                            if (value == "gallery") {
+                              xfile = await ImagePicker().pickImage(
+                                source: ImageSource.gallery,
+                              );
+                            }
+
+                            if (value == "camera") {
+                              xfile = await ImagePicker().pickImage(
+                                source: ImageSource.camera,
+                                imageQuality: 80,
+                                preferredCameraDevice: CameraDevice.rear,
+                              );
+                            }
+
+                            if (xfile != null) {
+                              if (!mounted) return;
+                              setState(() {
+                                myfile = File(xfile!.path);
+                              });
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: "gallery",
+                              child: Row(
+                                children: [
+                                  Icon(Icons.photo_library, size: 30),
+                                  SizedBox(width: 10),
+                                  Text("Gallery"),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: "camera",
+                              child: Row(
+                                children: [
+                                  Icon(Icons.photo_camera_rounded, size: 30),
+                                  SizedBox(width: 10),
+                                  Text("Camera"),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

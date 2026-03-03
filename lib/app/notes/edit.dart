@@ -73,6 +73,38 @@ class _AddNotesState extends State<EditNotes> {
                 key: formstate,
                 child: ListView(
                   children: [
+                    if (myfile != null ||
+                        (widget.notes['notes_image'] != null &&
+                            widget.notes['notes_image'] != "null"))
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 20),
+                          width: 140,
+                          height: 140,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipOval(
+                            child: myfile != null
+                                ? Image.file(myfile!, fit: BoxFit.cover)
+                                : Image.network(
+                                    "$linkImageRoot/${widget.notes['notes_image']}",
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, progress) {
+                                      if (progress == null) return child;
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Center(
+                                        child: Text("No Image"),
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ),
+                      ),
                     CustTextFormSign(
                       hint: "title",
                       mycontroller: title,
@@ -88,8 +120,6 @@ class _AddNotesState extends State<EditNotes> {
                       },
                     ),
                     SizedBox(height: 10),
-                    SizedBox(height: 10),
-
                     Row(
                       children: [
                         Expanded(
@@ -109,56 +139,7 @@ class _AddNotesState extends State<EditNotes> {
 
                         SizedBox(width: 10),
 
-                        IconButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (context) => FractionallySizedBox(
-                                heightFactor: 0.2,
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.all(20),
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () async {
-                                          XFile? xfile = await ImagePicker()
-                                              .pickImage(
-                                                source: ImageSource.gallery,
-                                              );
-                                          Navigator.of(context).pop();
-
-                                          if (xfile != null) {
-                                            myfile = File(xfile.path);
-                                            setState(() {});
-                                          }
-                                        },
-                                        icon: Icon(Icons.photo_library),
-                                      ),
-                                      SizedBox(width: 10),
-                                      IconButton(
-                                        onPressed: () async {
-                                          XFile? xfile = await ImagePicker()
-                                              .pickImage(
-                                                source: ImageSource.camera,
-                                                imageQuality: 80,
-                                              );
-                                          Navigator.of(context).pop();
-
-                                          if (xfile != null) {
-                                            myfile = File(xfile.path);
-                                            setState(() {});
-                                          }
-                                        },
-                                        icon: Icon(Icons.photo_camera_rounded),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                        PopupMenuButton<String>(
                           icon: Icon(
                             myfile == null
                                 ? Icons.image_rounded
@@ -167,6 +148,49 @@ class _AddNotesState extends State<EditNotes> {
                                 ? Colors.blueGrey[700]
                                 : Colors.green,
                           ),
+                          onSelected: (value) async {
+                            XFile? xfile;
+
+                            if (value == "gallery") {
+                              xfile = await ImagePicker().pickImage(
+                                source: ImageSource.gallery,
+                              );
+                            }
+
+                            if (value == "camera") {
+                              xfile = await ImagePicker().pickImage(
+                                source: ImageSource.camera,
+                                imageQuality: 80,
+                              );
+                            }
+
+                            if (xfile != null) {
+                              myfile = File(xfile.path);
+                              setState(() {});
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: "gallery",
+                              child: Row(
+                                children: [
+                                  Icon(Icons.photo_library),
+                                  SizedBox(width: 10),
+                                  Text("Gallery"),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: "camera",
+                              child: Row(
+                                children: [
+                                  Icon(Icons.photo_camera_rounded),
+                                  SizedBox(width: 10),
+                                  Text("Camera"),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
